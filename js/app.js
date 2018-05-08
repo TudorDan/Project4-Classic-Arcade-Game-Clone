@@ -9,7 +9,7 @@ var Enemy = function() {
     // Bug properties
     this.x = -101; //horizontal position in pixels
     this.y = Math.floor(Math.random() * 3) + 1; //start row = int number between 1 and 3;
-    /* Math.random() * generates any number between 0 and 3, including 0 but not 3.
+    /* Math.random() * generates any number (including decimals) between 0 and 3, including 0 but not 3.
     Math.floor() will ignore the decimals*/
     this.speed = Math.floor(Math.random() * 250) + 50; // speed in pixels per second [50,300]
 };
@@ -20,6 +20,12 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+    this.x += this.speed * dt;
+    if( this.x > 606) {
+        this.x = -101;
+        this.y = Math.floor(Math.random() * 3) + 1;
+        this.speed =  Math.floor(Math.random() * 250) + 50;
+    }
 };
 
 // Draw the enemy on the screen, required method for game
