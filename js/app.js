@@ -39,13 +39,52 @@ Enemy.prototype.render = function() {
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
-
+var Player = function() {
+    //player properties
+    this.x = 2; //start position = column number
+    this.y = 5; //start position = row number
+    this.direction = ''; /*direction for the next step of the player (since it is void, player is
+    currently stationary)*/
+    this.sprite = 'images/char-boy.png'; // player image
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
+/*We moved object instatiation in engine.js*/
 
+// Updates the player's position and
+// stops player from stepping outside the map
+Player.prototype.update = function() {
+    if(this.direction === 'left' && this.x > 0) {
+        this.x--; //move one step to the left
+        this.direction = ''; // stop in order to avoid endless moving
+    }
+    if(this.direction === 'right' && this.x < 4) {
+        this.x++;
+        this.direction = '';
+    }
+    if(this.direction === 'up' &&  this.y > 0) {
+        this.y--;
+        this.direction = '';
+    }
+    if(this.direction === 'down' && this.y < 5) {
+        this.y++;
+        this.direction = '';
+    }
+};
+
+// Draws the player on the screen
+Player.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x * 101, this.y * 83 - 10); /*Multiply
+    with 101 px for columns and 83 px for rows (raise 10 px for better fit in row)*/
+};
+
+// Change direction based on the activated key
+Player.prototype.handleInput = function(direction) {
+    this.direction = direction;
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
