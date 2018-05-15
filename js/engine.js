@@ -9,9 +9,12 @@
  * drawn but that is not the case. What's really happening is the entire "scene"
  * is being drawn over and over, presenting the illusion of animation.
  *
- * This engine makes the canvas' context (ctx) object globally available to make 
+ * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
+
+let allEnemies = []; //enemies array (innitialized in init() function)
+let player = new Player(); //player instantiation
 
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
@@ -23,6 +26,14 @@ var Engine = (function(global) {
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         lastTime;
+
+    /*We introduce levels, bugs number and player lives variables*/
+    let bugsSpan = document.getElementById("bugnr");
+    let livesSpan = document.getElementById("lifenr");
+    let levelSpan = document.getElementById("lvl");
+    let numberOfBugs = 1;
+    let numberOfLives = 3;
+    let level = 1;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -79,7 +90,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -95,6 +106,52 @@ var Engine = (function(global) {
         });
         player.update();
     }
+
+    /* This fuction checks if the player is in the same space with an enemy
+     * and if the player has reached the water (in which case, player goes to next level)
+     */
+     function checkCollisions() {
+        /* If player reaches water : increase
+        difficulty (increase the number of bugs once every 2 levels)*/
+        if (player.y === 0)
+        {
+            // increase and display level
+            level++;
+            levelSpan.innerHTML = level;
+
+            // increase and display number of enemies
+            numberOfBugs = Math.floor(level / 2) + 1; //increase bugs for every even level
+            while(allEnemies.length < numberOfBugs) allEnemies.push( new Enemy() );
+            bugsSpan.innerHTML = numberOfBugs;
+
+            // go back to start position
+            player.x = 2;
+            player.y = 5;
+        }
+
+        // On bug collision
+        for(let i=0; i<numberOfBugs; i++) {
+            if( allEnemies[i].y === player.y && //same row
+                /*Evaluate if any part of the bugs image intersects the player image, by visually modifying
+                pixels on x axis, through trial and error*/
+                ( allEnemies[i].x+99 > player.x*101+20 && allEnemies[i].x+99 < player.x*101+81 || // front side touch
+                  allEnemies[i].x-2 > player.x*101+20 && allEnemies[i].x-2 < player.x*101+81 ) // back side touch
+              ) {
+                //loose a life
+                numberOfLives--;
+                livesSpan.innerHTML = numberOfLives;
+
+                if(numberOfLives === 0) { //game over
+                    reset();
+                }
+                else {
+                    //reset position
+                    player.x = 2;
+                    player.y = 5;
+                }
+            }
+        }
+     }
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -117,7 +174,7 @@ var Engine = (function(global) {
             numRows = 6,
             numCols = 5,
             row, col;
-        
+
         // Before drawing, clear existing canvas
         ctx.clearRect(0,0,canvas.width,canvas.height)
 
@@ -161,7 +218,28 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+
+        //kill old bugs
+        allEnemies.splice(0, allEnemies.length);
+
+        //create a brand new bug
+        allEnemies.push( new Enemy() );
+
+        //resets level & write to page
+        level = 1;
+        levelSpan.innerHTML = level;
+
+        //resets number of bugs & write to page
+        numberOfBugs = 1;
+        bugsSpan.innerHTML = numberOfBugs;
+
+        //reset number of lives & write to page
+        numberOfLives = 3;
+        livesSpan.innerHTML = numberOfLives;
+
+        //resets the start position
+        player.x = 2;
+        player.y = 5;
     }
 
     /* Go ahead and load all of the images we know we're going to need to
