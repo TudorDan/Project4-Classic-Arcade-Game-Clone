@@ -6,12 +6,14 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+
     // Bug properties
-    this.x = -101; //horizontal position in pixels
+    this.x = -101; //horizontal position in pixels(outside the canvas, on the left)
     this.y = Math.floor(Math.random() * 3) + 1; //start row = int number between 1 and 3;
     /* Math.random() * generates any number (including decimals) between 0 and 3, including 0 but not 3.
+    We add 1 so that the bugs start below the water.
     Math.floor() will ignore the decimals*/
-    this.speed = Math.floor(Math.random() * 250) + 50; // speed in pixels per second [50,300]
+    this.speed = Math.floor(Math.random() * 250) + 50; /* speed between 50 and 300 pixels per second*/
 };
 
 // Update the enemy's position, required method for game
@@ -30,7 +32,8 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y * 83 - 22);/*We determine the row for
+    each bug as a multiple for 83 pixels (given in engine.js) and raise it 22 px for better fit in row.*/
 };
 
 // Now write your own player class
